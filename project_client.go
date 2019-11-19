@@ -91,6 +91,24 @@ func (p ProjectClient) DeliverStoryWithComment(storyId int, comment string) erro
 	return err
 }
 
+func (p ProjectClient) CommentOnStory(storyId int, comment string) error {
+	url := fmt.Sprintf("/stories/%d/comments", storyId)
+	request, err := p.createRequest("POST", url, nil)
+	if err != nil {
+		return err
+	}
+
+	buffer := &bytes.Buffer{}
+	json.NewEncoder(buffer).Encode(Comment{
+		Text: comment,
+	})
+
+	p.addJSONBodyReader(request, buffer)
+
+	_, err = p.conn.Do(request, nil)
+	return err
+}
+
 func (p ProjectClient) DeliverStory(storyId int) error {
 	url := fmt.Sprintf("/stories/%d", storyId)
 	request, err := p.createRequest("PUT", url, nil)
